@@ -1,0 +1,42 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+
+  config.vm.network "forwarded_port", guest: 8081, host: 9736
+  config.vm.network "forwarded_port", guest: 6379, host: 6379
+
+  config.vm.provision "shell", inline: <<-SHELL
+
+    # The Basics - RAWR!
+
+    # Uncomment if you live in beautiful British Columbia
+    # sed -i 's/archive\.ubuntu\.com/mirror\.it\.ubc\.ca/' /etc/apt/sources.list
+
+    # Back To School
+    add-apt-repository ppa:chris-lea/redis-server
+    apt-get update
+    apt-get -y upgrade
+
+    # Let's Joe Around
+    apt-get -y install software-properties-common joe
+
+    # Let Us Redis this place up
+    apt-get -y install redis-server
+
+    # Let's Do NodeJS
+    curl --silent --location https://deb.nodesource.com/setup_4.x | sudo bash -
+    apt-get install --yes nodejs
+
+  SHELL
+
+  config.vm.provision "shell", run: "always", privileged: false, inline: <<-SHELL
+
+    # Now Let's Redis-Commander!
+    sudo npm install -g redis-commander
+    screen -d -m redis-commander
+
+  SHELL
+end
