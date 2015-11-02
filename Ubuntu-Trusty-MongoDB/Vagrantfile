@@ -1,0 +1,29 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+
+  config.vm.network "forwarded_port", guest: 27017, host: 27017
+
+  config.vm.provision "shell", inline: <<-SHELL
+
+    # The Basics - RAWR!
+
+    # Uncomment if you live in beautiful British Columbia
+    # sed -i 's/archive\.ubuntu\.com/mirror\.it\.ubc\.ca/' /etc/apt/sources.list
+
+    # Back To School
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+    echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/mongodb.list
+    apt-get update
+    apt-get -y upgrade
+
+    # Let's Joe Around
+    apt-get -y install software-properties-common joe mongodb-org
+    sed -i 's/bind_ip/\#bind_ip/' /etc/mongod.conf
+    service mongod restart
+
+  SHELL
+end
